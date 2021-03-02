@@ -2,7 +2,7 @@
 
 AUTHOR: Hendrik.Mandelkow@gmail.com
 
-A fairly compact and efficient processing pipeline implemented in bash using [afni_proc.py](https://afni.nimh.nih.gov/pub/dist/doc/htmldoc/programs/afni_proc.py_sphx.html#ahelp-afni-proc-py) and the `swarm` wrapper for the SLURM batch processing system on Biowulf the HPC cluster at the NIH.
+A fairly compact and efficient processing pipeline implemented in Bash and Python using [afni_proc.py](https://afni.nimh.nih.gov/pub/dist/doc/htmldoc/programs/afni_proc.py_sphx.html#ahelp-afni-proc-py) and the batch processing system SLURM on Biowulf the HPC cluster at the NIH.
 
 
 ## USAGE

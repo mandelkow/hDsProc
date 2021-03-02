@@ -45,7 +45,7 @@ SUB='sub*'
 RWIN="100,100" # phys.regression window + step size see hmat2txt
 MinTR=600 # *** min. exp. length 30 minutes. Unset to disable.
 XSUB="2 40 53 67" # *** Sleep1 data! # Better use ../hendrik/0000_raw
-XRUN="20160902_0250 20170118_0222 20160630_0204 20160630_0609" # Exclude bad runs!
+XRUN="20160902_0250 20170118_0222 20160630_0204 20160630_0609 20160628_2232" # Exclude bad runs!
 
 # SLORD="alt+z2"
 # if (( $NSL%2 )); then SLORD="alt+z" # if odd # of slices, order 1,3,5,...,2,4,6,...
@@ -133,16 +133,7 @@ if [[ $MODE == "Swarm" ]]; then
     echo $PWD
     find -L $SUB -maxdepth 1 -type d -name "ses-*" -exec mkdir -vp $OutDir/{} \;
     find -L $SUB -maxdepth 1 -type d -name "ses-*" -exec ln -vs $PWD/{} $OutDir/{}/raw \;
-    cd $OutDir
-
-    if [[ ! -z $XSUB ]] ; then # ***
-        echo
-        #< echo +++ WARNING: Exclude subjects 2, 40, 53, 67
-        #< set +e ; for F in 02 40 53 67; do rename sub xsub sub-000$F ; done ; set -e
-        echo ++++ WARNING: Exclude subjects $XSUB
-        set +e ; for F in $XSUB; do rename sub xsub $( printf "sub-%05d" $F) ; done ; set -e
-        #< for F in 02 40 53 67; do ( set +e ; rename sub xsub sub-000$F ) ; done # This should work?!?
-    fi
+    # cd $OutDir
 
     #-------------------------------------------------------------------------------
     # NOTE: fMRI files are expected to be */*/*-$ExId.ext*
@@ -164,17 +155,23 @@ if [[ $MODE == "Swarm" ]]; then
         # cp -avs $InDir/$F $OutDir/${F%/func/*}/run-$ExId/${F##*/}
         # # cp -avs $InDir/$F $OutDir/${F%/func/*}/run-$ExId/$B
 
+        ## Skip bad runs - Alternatively, mark them below
+        if [[ $( printf "sub-%05d " $XSUB ) == *"${F%%/*}"* ]]; then
+            echo "+++ Skip bad subject: $InDir/${F%%/*}"
+            continue
+        fi
+        ## Skip bad runs - Alternatively, mark them below
+        if [[ $XRUN == *"$ExId"* ]]; then
+            echo "+++ Skip bad run: $InDir/$F"
+            continue
+        fi
         NTR=`3dinfo -nt $InDir/$F`
         ## Skip experiments < 30 minutes!
         if [[ ! -z $MinTR ]] && (( $NTR < $MinTR )) ; then
             echo "+++ Skip short experiment, NTR=$NTR<$MinTR : $F"
             continue
         fi
-        ## Skip bad runs
-        # if [[ $XRUN == *"$ExId"* ]]; then
-        #     echo "++++ Skip bad run: $InDir/$F"
-        #     continue
-        # fi
+
         #-------------------------------------------------------------------------------
         # TODO: Check for missing physio. # FIXIT: This does not work... :-(
         # TMP=$InDir/${F%/func/*}/biopac/*_run-$ExId.*
@@ -190,7 +187,16 @@ if [[ $MODE == "Swarm" ]]; then
     done
     cd $OutDir
 
-    #-------------------------------------------------------------------------------
+        #-------------------------------------------------------------------------------
+    if [[ ! -z $XSUB ]] ; then # ***
+        echo
+        #< echo +++ WARNING: Exclude subjects 2, 40, 53, 67
+        #< set +e ; for F in 02 40 53 67; do rename sub xsub sub-000$F ; done ; set -e
+        echo ++++ WARNING: Exclude subjects $XSUB
+        set +e ; for F in $XSUB; do rename sub xsub $( printf "sub-%05d" $F) ; done ; set -e
+        #< for F in 02 40 53 67; do ( set +e ; rename sub xsub sub-000$F ) ; done # This should work?!?
+    fi
+#-------------------------------------------------------------------------------
     # grep -i error -l sub-*/ses*/run*/*.o # Bad runs (missing physio)!
     if [[ ! -z $XRUN ]] ; then # ***
         echo +++ WARNING: Exclude bad runs $XRUN
@@ -248,11 +254,12 @@ EOL
     # [[ ! -z $TMP ]] && hcp_anat $TMP .
 
     #-------------------------------------------------------------------------------
-    ### Now submit swarm file?!
+    ### Now submit swarm file?! - More convenient without!?!
     # read -n 1 -p "+ Submit swarm file [y/n]? " YN
     # echo # newline
     # if [[ $YN != y ]] ; then echo ++ Quit. ; exit 0 ; fi
     # ./run_swarm.sh # eval ./run_swarm.sh
+
     exit 0
 fi
 
@@ -324,6 +331,7 @@ NTR=$( 3dinfo -nt Epi.nii ) && echo NTR=$NTR
 [[ -z $NTR ]] && echo "+++ Error: NTR is empty!" && exit 1
 NSL=`3dinfo -nk Epi.nii*` && echo NSL=$NSL
 TR=`3dinfo -tr Epi.nii*` && echo TR=$TR
+
 ## Skip experiments < 30 minutes!
 # if [[ ! -z $MinTR ]] && (( $NTR < $MinTR )) ; then
 #     echo "++++ Skip short experiment, NTR ($NTR) < MinTR ($MinTR)."
@@ -354,7 +362,7 @@ if [[ $JOB == *"Ric"* ]]; then
     ## Export RespRegHil
     #> hmat2txt.py -f -D -W "160,80" "${ExId}_phy.mat" RespRegHil RicRegs.1D
 
-    NTR=$( 3dinfo -nt Epi.nii )
+    #< NTR=$( 3dinfo -nt Epi.nii )
     # TODO: FIXIT: Why is the # of NTR a problem in only ~6 experiments?!? Note that 1 TR is dropped in AP below!?
     # TODO: FIXIT: What to do when NTR > physio?!? Padded values will be "censored" in RicRegMask
     if true ; then

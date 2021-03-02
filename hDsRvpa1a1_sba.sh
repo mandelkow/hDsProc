@@ -44,12 +44,12 @@ NTR=`3dinfo -nt Epi_Mc.nii*`
 
 hmat2txt -f -R $NTR $PHYS RespRegRvt > RespRvtWin.txt
 #< hcalctxt "np.concatenate([hshift0(X[0][:,:1],n) for n in (1,4)],1)" RespRvtWin.txt # No clue, why this does not work!?!
-hcalctxt "hshifts0(X[0],1,4)" RespRvtWin.txt > tmp.txt ; mv tmp.txt RespRvtWin.txt
+hcalctxt "hshifts0(X[0],4,0)" RespRvtWin.txt > tmp.txt ; mv tmp.txt RespRvtWin.txt
 hmat2txt -f -W $RWIN txt RespRvtWin.txt RespRvtWin.txt
 ORT+=" -ort RespRvtWin.txt"
 
 hmat2txt -f -R $NTR $PHYS CardRegAmp > CardAmpWin.txt
-hcalctxt "hshifts0(X[0],2,3)" CardAmpWin.txt > tmp.txt ; mv tmp.txt CardAmpWin.txt
+hcalctxt "hshifts0(X[0],1,3)" CardAmpWin.txt > tmp.txt ; mv tmp.txt CardAmpWin.txt
 hmat2txt -f -W $RWIN txt CardAmpWin.txt CardAmpWin.txt
 ORT+=" -ort CardAmpWin.txt"
 
