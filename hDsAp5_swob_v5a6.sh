@@ -86,7 +86,7 @@ while (( "$#" )); do
     -W|--rwin) RWIN="$2"; shift 2 ;;
     -m|--mtr) MinTR="$2"; shift 2 ;;
     -*|--*=) echo "Error: Unsupported flag $1" >&2 ; exit 1 ;;
-    *) ETC="$ETC $1"; shift ;; # preserve positional arguments
+    *) ETC="$ETC $1"; shift ;; # store other arguments
   esac
 done
 eval set -- "$ETC" # set $@ to positional arguments (without options)

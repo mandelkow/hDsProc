@@ -7,6 +7,12 @@
 # > .../hDsRvpa_sba.sh
 # > swarm -f tmp$TMP.swarm -g 32 -t $OMP_NUM_THREADS -m afni --logdir tmp${TMP}_log --merge-output --partition quick,norm
 #
+# OUTPUT:
+#   Epi_Mcrw.nii # Epi_Mcr - RVT - PPA
+#   Epi_Mcrw_std.nii # STD of Epi_Mcrw
+#   Epi_Mcrw_Vdr.nii # variance difference ratio (Epi_Mcrw_std - Epi_Mcr_std) / Epi_Mcr
+#   Epi_Mcrw_censor.nii # points censored (zero) in Epi_Mcrw
+#
 # NOTE: 2021-01-04
 #   Epi_Mcrv_* : No windowing.
 #   Epi_Mcrw1_* : Windowed 100TR but w/o detrend.
@@ -19,7 +25,7 @@ if [[ ! $1 == "-J" ]] && [[ -z $SLURM_ARRAY_JOB_ID ]] ; then
     TMP=$RANDOM
     cp -aLf $0 .
     cp -aLf $0 ./tmp${TMP}_job.sh
-    export OMP_NUM_THREADS=8 # mult.of 2
+    export OMP_NUM_THREADS=8 # mult.of 2! Will get exported to swarm.
     echo "# swarm -f tmp$TMP.swarm -g 32 -t $OMP_NUM_THREADS -m afni --logdir tmp${TMP}_log --merge-output --partition quick,norm" > tmp$TMP.swarm
     # find sub-00* -name Epi_Mc.nii* -printf "cd %h ; $PWD/hDsRvpa_sba.sh\n" >> tmp$TMP.swarm # ***
     # find sub-00* -name Epi_Mc.nii* -printf "cd %h ; ../../../../hDsRvpa1a1_sba.sh\n" >> tmp$TMP.swarm # ***
@@ -30,7 +36,8 @@ if [[ ! $1 == "-J" ]] && [[ -z $SLURM_ARRAY_JOB_ID ]] ; then
     echo "# swarm -f tmp$TMP.swarm -g 32 -t $OMP_NUM_THREADS -m afni --logdir tmp${TMP}_log --merge-output --partition norm,quick" >>  tmp$TMP.swarm
     set -x
     head tmp$TMP.swarm # print .swarm
-
+    read -n 1 -s -r -p "Press any key to submit batch, Ctrl-c to cancel."
+    swarm -f tmp$TMP.swarm -g 32 -t $OMP_NUM_THREADS -m afni --logdir tmp${TMP}_log --merge-output --partition norm,quick
     exit 0
 fi
 

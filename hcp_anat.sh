@@ -1,5 +1,14 @@
 #!/bin/bash
-# hcp_anat.sh [-c|-l] source_dir [dest_dir]
+# hcp_anat.sh [+++] Copy (-c), link (-l) or sym-link $source/sub-*/ses-*/run-*/anat_warp to $PWD/... or $dest/...
+#
+# USAGE: hcp_anat.sh [-c|-l] source_dir [dest_dir]
+#
+# SEE ALSO: hDsAp5_swob_*.sh
+# AUTHOR: H.Mandelkow, 2020
+
+# HOWTO use sed to print 1st block of comments (help): [[ $# -eq 0 ]]
+if [[ -z $1 ]] || [[ $1=='-h' ]]; then echo; sed -n '/^# /,/^$/p ; /^$/q' $0; exit 0; fi
+if [[ -z $1 ]]; then echo ERROR: Missing input SOURCE_DIR ; exit 1; fi
 
 if [[ $1 == -* ]]; then MODE=$1 ; shift ; fi
 SRC=`readlink -e $1`
