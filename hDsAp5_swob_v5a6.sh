@@ -315,7 +315,7 @@ if [ -z $ANAT ]; then echo ERROR: Missing ANAT! ; exit 1; fi
 # HOWTO test for files / executables on the path:
 # if [[ -z $( test -p hmrphys.py ) ]]; then export PATH=$PATH:$HOME/matlab/hMrPhys ; fi
 # if [[ -z $( test -p hcalctxt.py ) ]]; then export PATH=$PATH:$HOME/matlab/hDsProc ; fi
-export PATH=$HOME/matlab/hMrPhys:$HOME/matlab/hDsProc:$PATH
+# export PATH=$HOME/matlab/hMrPhys:$HOME/matlab/hDsProc:$PATH
 echo PATH= $PATH
 
 #< HOWTO make alias work inside a bash script:
