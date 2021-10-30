@@ -60,10 +60,10 @@ GOF=0 # AP -GOFORIT 0=OFF
 HelpText="
 USAGE 1: cd dest/dir ; $0 -S <Job> source/dir
 USAGE 2: cd output/dir ; $0 -J <Job>
-<Job> = 'All' or any combination of RicNwarpReg
+<Job> = 'All' or any combination of RicAlwReg
 
 -h | --help         # Catch 22
--S | --Swarm All    # make swarm with --Job All (or any of RicNwarpRegGof99)
+-S | --Swarm All    # make swarm with --Job All (or any of RicAlwReg...)
 -J | --Job All      # run single swarm job
 -t | --task ''      # default, find any task-*, -t sleep ...for sleep data
 -s | --sub          #  subject ID
@@ -266,7 +266,7 @@ fi
 #######################################################################################
 #######################################################################################
 #######################################################################################
-if [[ $JOB == "All" ]]; then JOB="RicNwarpReg" ; fi # ***
+if [[ $JOB == "All" ]]; then JOB="RicAlwReg" ; fi # ***
 echo "+++ JOB= $JOB"
 [[ -d /lscratch/$SLURM_JOB_ID ]] && export TMPDIR=/lscratch/$SLURM_JOB_ID
 
@@ -386,15 +386,15 @@ if [[ $JOB == *"Ric"* ]]; then
         echo "++ [Ricc]: Use CARD. regressors from hmrphys -> RicRegs.1D"
         #< hmat2txt.py -f -D -W $RWIN "${ExId}_phy.mat" CardRegHil | head -n $NTR > RicRegs.1D # *** Card only!
         hmat2txt.py -f -D -R $NTR -W $RWIN "${ExId}_phy.mat" CardRegHil > RicRegs.1D # *** Card only!
-    elif [[ $JOB == *"Ric2"* ]]; then
+    elif [[ $JOB == *"Ricr"* ]]; then
+        echo "++ [Ric]: Use RESP. regressors from hmrphys -> RicRegs.1D"
+        #< hmat2txt.py -f -D -W $RWIN "${ExId}_phy.mat" RespRegHil | head -n $NTR > RicRegs.1D # *** Resp only!
+        hmat2txt.py -f -D -R $NTR -W $RWIN "${ExId}_phy.mat" RespRegHil > RicRegs.1D # *** Resp only!
+    else # elif [[ $JOB == *"Ric2"* ]]; then
         echo "++ [Ric]: Use RESP+CARD regressors from hmrphys -> RicRegs.1D"
         # ( set -x ; hmat2txt.py -f -D -W $RWIN "${ExId}_phy.mat" "CardRegHil,RespRegHil" | head -n $NTR > RicRegs.1D ) # *** Resp+Card! NOT TESTED!
         #< hmat2txt.py -f -D -W $RWIN "${ExId}_phy.mat" "CardRegHil,RespRegHil" | head -n $NTR > RicRegs.1D # *** Resp+Card! NOT TESTED!
         hmat2txt.py -f -D -R $NTR -W $RWIN "${ExId}_phy.mat" "CardRegHil,RespRegHil" > RicRegs.1D
-    else # elif [[ $JOB == *"Ricr"* ]]; then
-        echo "++ [Ric]: Use RESP. regressors from hmrphys -> RicRegs.1D"
-        #< hmat2txt.py -f -D -W $RWIN "${ExId}_phy.mat" RespRegHil | head -n $NTR > RicRegs.1D # *** Resp only!
-        hmat2txt.py -f -D -R $NTR -W $RWIN "${ExId}_phy.mat" RespRegHil > RicRegs.1D # *** Resp only!
     fi
     # set +x
     # $(( $NTR != `wc -l RicRegs.1D`)) && echo ERROR && exit 1
@@ -538,6 +538,7 @@ if [[ $JOB == *"Ric"* ]]; then
 else
     BLOCKS=$( sed s/ricor// <<< $BLOCKS )
 fi
+[[ $JOB == *"Nwarp"* ]] && echo '+++ JOB = "Nwarp" depreciated, use "Alw" instead.'
 if [[ $JOB == *"Nwarp"* ]] || [[ $JOB == *"Alw"* ]]; then # NON-linear align to Talairach
     APAR+=" -copy_anat ./anat_warp/anatSS.$ExId.nii* -anat_has_skull no "
     APAR+=" -volreg_tlrc_warp -tlrc_base $TLRC "
