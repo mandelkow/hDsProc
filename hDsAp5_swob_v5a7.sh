@@ -110,7 +110,7 @@ echo $@ ;
 if [[ $MODE == "Swarm" ]]; then
     echo "##### PREPARE SWARM #####"
     OutDir=$PWD
-    InDir=${1%/} # remove trailing /
+    InDir=${1%/} # +++ set InDir and remove trailing /
     # InDir=/data/AMRI/sleep1
     # if [[ ! -z $1 ]] ; then InDir=$1 ; fi
     #< JobSh=~/matlab/hDsBw/hDsAp4_job_v4b3.sh
@@ -120,8 +120,11 @@ if [[ $MODE == "Swarm" ]]; then
     JobSh="../../../${0##*/} -J $JOB"
 
     #-------------------------------------------------------------------------------
-    # read -n 1 -p "+ Use OutDir= $OutDir [y/n]? " YN
-    # if [[ $YN != y ]] ; then echo -e "\n++ Abort!" ; exit 0 ; fi
+    [[ InDir == *"sleep2"* ]] && unset XSUB XRUN # Allow for Sleep2 data.
+    
+    #-------------------------------------------------------------------------------
+    #< read -n 1 -p "+ Use OutDir= $OutDir [y/n]? " YN
+    #< if [[ $YN != y ]] ; then echo -e "\n++ Abort!" ; exit 0 ; fi
     echo "+ Use OutDir= $OutDir [WAIT 5s or CANCEL!] "; sleep 5s
     echo # newline
     echo "+ Using InDir=$InDir"
@@ -312,7 +315,7 @@ OW=false # overwrite flag
 TR0=0 # Remove volumes 0..TR0-1
 ORI=LPI # = LR,PA,IS desired orientation # NOTE: 3dresample -orient asks for *ORIGIN*!
 #< ANAT=`find ../../ses-*/raw/anat/ -name "*anat-mprage.nii*" -print -quit`
-ANAT=`find ../../ses-*/raw/anat/ -name "*anat-mprage*.nii*" -print -quit`
+ANAT=`find ../../ses-*/raw/anat/ -name "*anat-*mprage*.nii*" -print -quit`
 if [ -z $ANAT ]; then echo ERROR: Missing ANAT for `pwd`! ; exit 1; fi
 echo ANAT = $ANAT
 3dinfo $ANAT
